@@ -9,55 +9,63 @@ import reviewRoute from './routes/reviews.js';
 import tourRoute from './routes/tours.js';
 import userRoute from './routes/user.js';
 
-dotenv.config()
-const app = express()
-const port = process.env.PORT 
+dotenv.config();
+const app = express();
+const port = process.env.PORT;
 
-const whitelist = ['http://localhost:3000', 'http://localhost:4000', 'https://tour-management-l8r9.onrender.com']
 const corsOptions = {
   credentials: true,
-  origin: function(origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  }
-}
+  origin: true,
+};
 
-//  middlewere 
-app.use(express.json())
-app.use(cookieParser())
-app.use(cors(corsOptions))
+// const whitelist = ['http://localhost:3000', 'http://localhost:4000',];
+
+// const corsOptions = {
+//   credentials: true,
+//   origin: function (origin, callback) {
+//     console.log('Incoming Origin:', origin);
+//     if (!origin || whitelist.indexOf(origin) !== -1) {
+//       console.log('Origin allowed:', origin);
+//       callback(null, true);
+//     } else {
+//       console.log('Origin not allowed:', origin);
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+// };
+
+// middleware
+
+app.use(express.json());
+app.use(cookieParser());
+app.use(cors(corsOptions));
 
 // routing
-
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
-// additional route 
-app.use('/auth', auth)
-app.use('/tours', tourRoute)
-app.use('/users', userRoute)
-app.use('/review', reviewRoute)
-app.use('/booking', bookingRoute)
+// additional routes
+app.use('/auth', auth);
+app.use('/tours', tourRoute);
+app.use('/users', userRoute);
+app.use('/review', reviewRoute);
+app.use('/booking', bookingRoute);
 
-
-// database connections 
-mongoose.set('strictQuery', false)
-const connect = async() =>{
-     try {
+// database connection
+mongoose.set('strictQuery', false);
+const connect = async () => {
+  try {
     await mongoose.connect(process.env.MongoDb_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
     });
-    console.log("MongoDB database connectd");
-} catch (error) {
-    console.log(error)
-    }
-}
+    console.log('MongoDB database connected');
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 app.listen(port, () => {
   connect();
-  console.log('Server listening on port 4000');
+  console.log(`Server listening on port ${port}`);
 });
