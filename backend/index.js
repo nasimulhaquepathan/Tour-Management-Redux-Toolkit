@@ -13,7 +13,7 @@ dotenv.config()
 const app = express()
 const port = process.env.PORT 
 
-const whitelist = ['http://localhost:3000', 'http://localhost:4000']
+const whitelist = ['http://localhost:3000', 'http://localhost:4000', 'https://tour-management-l8r9.onrender.com']
 const corsOptions = {
   credentials: true,
   origin: function(origin, callback) {
