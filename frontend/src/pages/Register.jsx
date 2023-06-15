@@ -1,92 +1,132 @@
+import { useState, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { FaUser } from 'react-icons/fa'
+import { register, reset } from '../redux/slices/auth/authSlice'
+import Spinner from '../components/Spiner/Spiner'
 
-import React, { useContext, useState } from 'react'
-import '../styles/register.css'
+function Register() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    password2: '',
+  })
 
-import { Link, useNavigate } from 'react-router-dom'
-import { Button, Col, Container, Form, FormGroup, Row } from 'reactstrap'
-import registerImg from '../assets/images/register.png'
-import userIcon from '../assets/images/user.png'
+  const { name, email, password, password2 } = formData
 
-import { AuthContext } from '../context/AuthContext'
-import { BASE_URL } from '../utils/config'
-
-const Register = () => {
-  
-  const [credentials, setCredentials] = useState({
-    username: undefined,
-    email: undefined,
-    password: undefined,
-  });
-  
-  const {dispatch} = useContext(AuthContext)
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
-  const handleChange = e =>{
-    setCredentials(prev=> ({...prev, [e.target.id]: e.target.value}))
+  const { user, isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.auth
+  )
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message)
+    }
+
+    if (isSuccess || user) {
+      navigate('/')
+    }
+
+    dispatch(reset())
+  }, [user, isError, isSuccess, message, navigate, dispatch])
+
+  const onChange = (e) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }))
   }
 
-  const handleClick = async e =>{
-    e.preventDefault();
-    
-      try {
-        const res = await fetch(`${BASE_URL}/auth/register`, {
-          method: 'post',
-          headers: {
-            'content-type':'application/json'
-          },
-          body: JSON.stringify(credentials)
-        })
-        
-        const result = await res.json()
-        if(!res.ok){
-          alert(result.message)
-        } else {
-          dispatch({type: 'REGISTER_SUCCESS'})
-          alert('User successfully created')
-          console.log(result)
-          navigate('/login')
-        }
-      } catch (err) {
-          alert(err.message)
+  const onSubmit = (e) => {
+    e.preventDefault()
+
+    if (password !== password2) {
+      toast.error('Passwords do not match')
+    } else {
+      const userData = {
+        name,
+        email,
+        password,
       }
+
+      dispatch(register(userData))
+      toast.success(userData)
+    }
   }
+
+  if (isLoading) {
+    return <Spinner />
+  }
+
   return (
-    <section>
-      <Container>
-        <Row>
-          <Col lg='8' className='m-auto'>
-            <div className="login_container d-flex justify-content-between">
-              <div className="login_img">
-                <img src={registerImg} alt="" />
-              </div>
+    <>
+      <section className='heading'>
+        <h1>
+          <FaUser /> Register
+        </h1>
+        <p>Please create an account</p>
+      </section>
 
-              <div className="login_form">
-                 <div className="user">
-                  <img src={userIcon} alt="" />
-                 </div>
-                 <h2>Register</h2>
-
-                 <Form
-                 onSubmit={handleClick}>
-                  <FormGroup>
-                    <input type="text" placeholder='Username' required id='username' onChange={handleChange}  />
-                  </FormGroup>
-                  <FormGroup>
-                    <input type="email" placeholder='Email' required id='email' onChange={handleChange}  />
-                  </FormGroup>
-                  <FormGroup>
-                    <input type="password" placeholder='Password' required id='password' onChange={handleChange}  />
-                  </FormGroup>
-                  <Button className='btn secondary__btn auth_btn' type='submit'>Register</Button>
-                 </Form>
-                 <p>Already have an account? <Link to='/login'>Login</Link></p>
-              </div>
-            </div>
-          </Col>
-        </Row>
-      </Container>
-    </section>
+      <section className='form'>
+        <form onSubmit={onSubmit}>
+          <div className='form-group'>
+            <input
+              type='text'
+              className='form-control'
+              id='name'
+              name='name'
+              value={name}
+              placeholder='Enter your name'
+              onChange={onChange}
+            />
+          </div>
+          <div className='form-group'>
+            <input
+              type='email'
+              className='form-control'
+              id='email'
+              name='email'
+              value={email}
+              placeholder='Enter your email'
+              onChange={onChange}
+            />
+          </div>
+          <div className='form-group'>
+            <input
+              type='password'
+              className='form-control'
+              id='password'
+              name='password'
+              value={password}
+              placeholder='Enter password'
+              onChange={onChange}
+            />
+          </div>
+          <div className='form-group'>
+            <input
+              type='password'
+              className='form-control'
+              id='password2'
+              name='password2'
+              value={password2}
+              placeholder='Confirm password'
+              onChange={onChange}
+            />
+          </div>
+          <div className='form-group'>
+            <button type='submit' className='btn btn-block'>
+              Submit
+            </button>
+          </div>
+        </form>
+      </section>
+    </>
   )
 }
 
-export default Register 
+export default Register

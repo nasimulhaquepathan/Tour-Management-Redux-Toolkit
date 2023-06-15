@@ -1,7 +1,9 @@
-import React, { useContext, useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { Button, Container, Row } from 'reactstrap'
-import { AuthContext } from '../../context/AuthContext'
+import { logout, reset } from '../../redux/slices/auth/authSlice'
+// import { AuthContext } from '../../context/AuthContext'
 
 import logo from '../../assets/images/logo.png'
 import './header.css'
@@ -23,13 +25,17 @@ const nav_Links = [
 
 const Header = () => {
 
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+
   const headeRef = useRef(null)
   const menuRef = useRef(null)
-  const navigate = useNavigate()
-  const {user, dispatch} = useContext(AuthContext)
+  const { user } = useSelector((state) => state.auth)
+  // const {user, dispatch} = useContext(AuthContext)
 
-  const logout = () =>{
-    dispatch({type: 'LOGOUT'})
+  const Logout = () => {
+    dispatch(logout())
+    dispatch(reset())
     navigate('/')
   }
 
@@ -80,7 +86,7 @@ const Header = () => {
                   user? (
                     <>
                   <h5 className="mb-0">{user.username}</h5>
-                  <Button className='btn btn-dark' onClick={logout}>Logout</Button>
+                  <Button className='btn btn-dark' onClick={Logout}>Logout</Button>
                   </>
                   ) : (
                     <>

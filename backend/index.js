@@ -1,13 +1,14 @@
-import cookieParser from 'cookie-parser';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import express from 'express';
-import mongoose from 'mongoose';
-import auth from './routes/auth.js';
-import bookingRoute from './routes/bookings.js';
-import reviewRoute from './routes/reviews.js';
-import tourRoute from './routes/tours.js';
-import userRoute from './routes/user.js';
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import dotenv from "dotenv";
+import express from "express";
+import mongoose from "mongoose";
+import auth from "./routes/auth.js";
+import bookingRoute from "./routes/bookings.js";
+import reviewRoute from "./routes/reviews.js";
+import tourRoute from "./routes/tours.js";
+import userRoute from "./routes/user.js";
+import goalRoute from "./routes/goal.js";
 
 dotenv.config();
 const app = express();
@@ -41,25 +42,26 @@ app.use(cookieParser());
 app.use(cors(corsOptions));
 
 // routing
-app.get('/', (req, res) => {
-  res.send('Hello World!');
+app.get("/", (req, res) => {
+  res.send("Hello World!");
 });
 // additional routes
-app.use('/auth', auth);
-app.use('/tours', tourRoute);
-app.use('/users', userRoute);
-app.use('/review', reviewRoute);
-app.use('/booking', bookingRoute);
+app.use("/auth", auth);
+app.use("/tours", tourRoute);
+app.use("/users", userRoute);
+app.use('/goals', goalRoute)
+app.use("/review", reviewRoute);
+app.use("/booking", bookingRoute);
 
 // database connection
-mongoose.set('strictQuery', false);
+mongoose.set("strictQuery", false);
 const connect = async () => {
   try {
     await mongoose.connect(process.env.MongoDb_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log('MongoDB database connected');
+    console.log("MongoDB database connected");
   } catch (error) {
     console.log(error);
   }

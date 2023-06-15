@@ -1,91 +1,102 @@
-import React, { useContext, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Button, Col, Container, Form, FormGroup, Row } from 'reactstrap'
-import '../styles/login.css'
+import { useState, useEffect } from 'react'
+import { FaSignInAlt } from 'react-icons/fa'
+import { useSelector, useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { login, reset } from '../redux/slices/auth/authSlice'
+import Spinner from '../components/Spiner/Spiner'
 
-import loginImg from '../assets/images/login.png'
-import userIcon from '../assets/images/user.png'
+function Login() {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  })
 
-import { AuthContext } from '../context/AuthContext'
-import { BASE_URL } from '../utils/config'
+  const { email, password } = formData
 
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
 
-const Login = () => {
+  const { user, isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.auth
+  )
 
-  const [credentials, setCredentials] = useState({
-    email: undefined,
-    password: undefined
-})
+  useEffect(() => {
+    if (isError) {
+      toast.error(message)
+    }
 
-const {dispatch} = useContext(AuthContext)
-const navigate = useNavigate()
+    if (isSuccess || user) {
+      navigate('/')
+    }
 
-  const handleChange = (e) => {
-    setCredentials(prev=> ({...prev, [e.target.id]: e.target.value}))
+    dispatch(reset())
+  }, [user, isError, isSuccess, message, navigate, dispatch])
+
+  const onChange = (e) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }))
   }
 
-  const handleClick = async e =>{
-    e.preventDefault();
+  const onSubmit = (e) => {
+    e.preventDefault()
 
-      dispatch({type: "LOGIN_START"})
+    const userData = {
+      email,
+      password,
+    }
 
-      try {
-        const res = await fetch(`${BASE_URL}/auth/login`, {
-          method: 'post',
-          headers: {
-            'content-type':'application/json'
-          },
-          credentials: 'include',
-          body: JSON.stringify(credentials)
-        })
-        const result = await res.json() 
-
-        console.log(result.data)
-        if(!res.ok) alert(result.message)   
-                                                         
-          dispatch({type: 'LOGIN_SUCCESS', payload: result.data})
-          
-          alert('Successully login')
-          navigate('/')
-      } catch (err) {
-        dispatch({type: 'LOGIN_FAILURE' , payload: err.message})
-      }
+    dispatch(login(userData))
   }
 
+  if (isLoading) {
+    return <Spinner />
+  }
 
   return (
-    <section>
-      <Container>
-        <Row>
-          <Col lg='8' className='m-auto'>
-            <div className="login_container d-flex justify-content-between">
-                                 <div className="login_img">
-                <img src={loginImg} alt="" />
-              </div>
+    <>
+      <section className='heading'>
+        <h1>
+          <FaSignInAlt /> Login
+        </h1>
+        <p>Login and start setting goals</p>
+      </section>
 
-              <div className="login_form">
-                 <div className="user">
-                              <img src={userIcon} alt="" />
-                 </div>
-                 <h2>Login</h2>
+      <section className='form'>
+        <form onSubmit={onSubmit}>
+          <div className='form-group'>
+            <input
+              type='email'
+              className='form-control'
+              id='email'
+              name='email'
+              value={email}
+              placeholder='Enter your email'
+              onChange={onChange}
+            />
+          </div>
+          <div className='form-group'>
+            <input
+              type='password'
+              className='form-control'
+              id='password'
+              name='password'
+              value={password}
+              placeholder='Enter password'
+              onChange={onChange}
+            />
+          </div>
 
-                 <Form
-                 onSubmit={handleClick}>
-                  <FormGroup>
-                    <input type="email" placeholder='Email' required id='email' onChange={handleChange}  />
-                  </FormGroup>
-                  <FormGroup>
-                    <input type="password" placeholder='Password' required id='password' onChange={handleChange}  />
-                  </FormGroup>
-                  <Button className='btn secondary__btn auth_btn' type='submit'>Login</Button>
-                 </Form>
-                 <p>Don't have an account? <Link to='/register'>Create</Link></p>
-              </div>
-            </div>
-          </Col>
-        </Row>
-      </Container>
-    </section>
+          <div className='form-group'>
+            <button type='submit' className='btn btn-block'>
+              Submit
+            </button>
+          </div>
+        </form>
+      </section>
+    </>
   )
 }
 
