@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { FaSignInAlt } from 'react-icons/fa'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
@@ -57,45 +56,48 @@ function Login() {
 
   return (
     <>
-      <section className='heading'>
-        <h1>
-          <FaSignInAlt /> Login
-        </h1>
-        <p>Login and start setting goals</p>
-      </section>
-
-      <section className='form'>
-        <form onSubmit={onSubmit}>
-          <div className='form-group'>
-            <input
-              type='email'
-              className='form-control'
-              id='email'
-              name='email'
-              value={email}
-              placeholder='Enter your email'
-              onChange={onChange}
-            />
+      <section>
+      <div className='container mt-5'>
+        <div className='row justify-content-center'>
+          <div className='col-md-6'>
+            <div className='card'>
+              <div className='card-header text-center '>
+                <h4>Login Form</h4>
+              </div>
+              <div className='card-body'>
+                <form onSubmit={onSubmit}>
+                <div className='form-group mb-2'>
+                    <input
+                      type='email'
+                      className='form-control'
+                      id='email'
+                      name='email'
+                      value={email}
+                      placeholder='Enter your email'
+                      onChange={onChange}
+                    />
+                  </div>
+                  <div className='form-group mb-2'>
+                    <input
+                      type='password'
+                      className='form-control'
+                      id='password'
+                      name='password'
+                      value={password}
+                      placeholder='Enter your password'
+                      onChange={onChange}
+                    />
+                  </div>
+                  <button type='submit' className='btn btn-primary text-center'>
+                    Login
+                  </button>
+                </form>
+              </div>
+            </div>
           </div>
-          <div className='form-group'>
-            <input
-              type='password'
-              className='form-control'
-              id='password'
-              name='password'
-              value={password}
-              placeholder='Enter password'
-              onChange={onChange}
-            />
-          </div>
-
-          <div className='form-group'>
-            <button type='submit' className='btn btn-block'>
-              Submit
-            </button>
-          </div>
-        </form>
-      </section>
+        </div>
+      </div>
+    </section>
     </>
   )
 }
